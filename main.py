@@ -1,5 +1,7 @@
 from backend import RatingDB
 
+## 暂时不用main作为入口，转至UI.py启动
+
 # 初始化数据库
 db = RatingDB('my_images.db')
 

@@ -96,8 +96,8 @@ class CompareWindow(QWidget):
         else:
             winner, loser = self.current_right, self.current_left
 
-        if winner.rating.mean > loser.rating.mean:
-            print("success")
+        # todo : 这边的逻辑是临时加的回头改下，总之作用意思是只有模型分数打的偏差过大时才算fail（仅UI响应）。
+        if winner.rating.mean + 3 > loser.rating.mean:
             self.sfx_success.play()
         else:
             self.sfx_fail.play()
