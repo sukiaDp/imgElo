@@ -1,49 +1,25 @@
-import sqlite3 as sq3
+from backend import RatingDB
 
-# test_trueskill.py
-from sukiaTrueSkill import Rating, match1v1
+# 初始化数据库
+db = RatingDB('my_images.db')
 
-def show(name, r):
-    print(f"  {name}: μ={r.mean:.2f}, σ={r.std:.2f}")
+# 扫描文件夹建表
+stats = db.init_from_folder(r'\\192.168.2.25\hardDrive\imgEloTest')
+print(f"新增 {stats['new']} 张，更新 {stats['updated']} 张")
 
-# 测试1: 势均力敌
-print("=== 势均力敌，a 赢 ===")
-a, b = Rating(), Rating()
-print("Before:")
-show("a", a)
-show("b", b)
-a, b = match1v1(a, b)
-print("After:")
-show("a", a)
-show("b", b)
+# 抽取一对图片
+img_high_var, img_low_var = db.sample_pair()
+print(f"图片1: {img_high_var.path}")
+print(f"图片2: {img_low_var.path}")
 
-# 测试2: 强者赢弱者（不意外，小更新）
-print("\n=== 强者赢弱者 ===")
-strong = Rating(mean=35, sigma=4)
-weak = Rating(mean=15, sigma=4)
-print("Before:")
-show("strong", strong)
-show("weak", weak)
-strong, weak = match1v1(strong, weak)
-print("After:")
-show("strong", strong)
-show("weak", weak)
+# 用户选择后更新（假设 img_high_var 赢了）
+db.update(winner=img_high_var, loser=img_low_var)
 
-# 测试3: 弱者爆冷（大更新）
-print("\n=== 弱者爆冷 ===")
-strong = Rating(mean=35, sigma=4)
-weak = Rating(mean=15, sigma=4)
-print("Before:")
-show("strong", strong)
-show("weak", weak)
-weak, strong = match1v1(weak, strong)  # weak 赢了
-print("After:")
-show("strong", strong)
-show("weak", weak)
+# 查看排名
+for img in db.get_ranking():
+    print(f"{img.rating.mean:.1f} ± {img.rating.std:.1f}  {img.path}")
 
-# 测试4: 连续比赛看收敛
-print("\n=== 10 连胜 ===")
-a, b = Rating(), Rating()
-for i in range(10):
-    a, b = match1v1(a, b)
-    print(f"Round {i+1}: a={a.mean:.2f}±{a.std:.2f}, b={b.mean:.2f}±{b.std:.2f}")
+# 删除
+db.delete(img_high_var.hash)
+
+db.close()

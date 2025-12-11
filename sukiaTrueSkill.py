@@ -22,9 +22,9 @@ def w_func(t):
 
 
 class Rating:
-    def __init__(self, mean=25.0, sigma=8.33):
+    def __init__(self, mean=25.0, std=8.33):
         self.mean = mean
-        self.var = sigma ** 2
+        self.var = std ** 2
 
     @property
     def std(self):
@@ -51,13 +51,13 @@ def match1v1(winner : Rating, loser : Rating):
     t = (winner.mean - loser.mean) / c
 
 
-    win_update_mean = winner.mean + w_var / c * v_func(t)
-    win_update_var = w_var  * (1 - w_var / c_sq * w_func(t))
+    winner_update_mean = winner.mean + w_var / c * v_func(t)
+    winner_update_var = w_var  * (1 - w_var / c_sq * w_func(t))
 
     loser_update_mean = loser.mean - l_var / c * v_func(t)
     loser_update_var = l_var  * (1 - l_var / c_sq * w_func(t))
 
-    winnerUpdate = Rating.from_var(win_update_mean, win_update_var)
+    winnerUpdate = Rating.from_var(winner_update_mean, winner_update_var)
     loserUpdate = Rating.from_var(loser_update_mean, loser_update_var)
 
     return winnerUpdate,loserUpdate
